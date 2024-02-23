@@ -7,25 +7,33 @@ it. This has been tested with `podman` on Arch Linux so no SELinux.
 
 ## Usage
 
-You have to build the container first, it's about ~25GB when finished but needs
-a lot more when building. This is going to take a while depending on your
-system and internet connection.
+You have to build the container first, it's about 6.37 GB when finished. This
+is going to take a while depending on your system and internet connection.
 
 ```
 podman build -t . $NAME
 ```
 
+In order to pass the NVIDIA GPU to the container it's most convenient to use
+the
+[nvidia-container-toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html).
+After the installation you should just need to run `sudo nvidia-ctk cdi
+generate --output=/etc/cdi/nvidia.yaml` and you're good to go.
+
 Now just run the container passing all the nvidia devices and forwarding the 8001 port. Example command:
 
 ```
-podman run -it --rm --device /dev/nvidia0 --device /dev/nvidiactl --device /dev/nvidia-uvm --device /dev/nvidia-uvm-tools --device /dev/nvidia-caps/nvidia-cap1 --device /dev/nvidia-caps/nvidia-cap2 --name ai-test -p 8001:8001 $NAME /bin/bash
+podman run -it --rm --device nvidia.com/gpu=all --name ai-test -p 8001:8001 $NAME /bin/bash
 ```
 
-When inside just change to the `privateGPT` directory, change any settings, download the models and run it.
+When inside just change whatever you need and run it:
 
 ```
-cd privateGPT
 vim settings.yaml #change your embedding or llm modesl or whatever
 poetry run python scripts/setup
 make run
 ```
+## Credits
+
+Big thanks to @icsy7867 for suggesting to use the cuda image as a base and for
+using the Nvidia CDI!
