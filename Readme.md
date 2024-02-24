@@ -1,4 +1,4 @@
-# Arch based container for running privateGPT
+# Container image for running privateGPT
 
 I've created a simple Containerfile for running
 [privateGPT](https://github.com/imartinez/privateGPT) on an NVIDIA GPU. Once
@@ -7,11 +7,11 @@ it. This has been tested with `podman` on Arch Linux so no SELinux.
 
 ## Usage
 
-You have to build the container first, it's about 6.37 GB when finished. This
+You have to build the container first, it's about 6.36 GB when finished. This
 is going to take a while depending on your system and internet connection.
 
 ```
-podman build -t . $NAME
+podman build -t . $IMAGE_NAME
 ```
 
 In order to pass the NVIDIA GPU to the container it's most convenient to use
@@ -20,20 +20,16 @@ the
 After the installation you should just need to run `sudo nvidia-ctk cdi
 generate --output=/etc/cdi/nvidia.yaml` and you're good to go.
 
-Now just run the container passing all the nvidia devices and forwarding the 8001 port. Example command:
+Now just run the container passing all the nvidia devices, forwarding the 8001
+port and mounting you local privateGPT checkout. Example command:
 
 ```
-podman run -it --rm --device nvidia.com/gpu=all --name ai-test -p 8001:8001 $NAME /bin/bash
+podman run -it --rm --device nvidia.com/gpu=all -v ./privateGPT:/app -p 8001:8001 $IMAGE_NAME
 ```
 
-When inside just change whatever you need and run it:
+Make any config changes in your local checkout including downloading the models prior to running.
 
-```
-vim settings.yaml #change your embedding or llm modesl or whatever
-poetry run python scripts/setup
-make run
-```
 ## Credits
 
-Big thanks to @icsy7867 for suggesting to use the cuda image as a base and for
+Big thanks to [icsy7867](https://github.com/icsy7867) for suggesting to use the cuda image as a base and for
 using the Nvidia CDI!
